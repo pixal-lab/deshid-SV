@@ -6,8 +6,8 @@ const pool = new Pool({
     database: 'DESHIDRATADOR'
 });
 
-const register = async (req,res) => {
-    const response = await pool.query('SELECT * FROM clientes');
+const register = (req,res) => {
+    //const response = await pool.query('SELECT * FROM clientes');
 };
 
 const getUsers = (req, res) => {
