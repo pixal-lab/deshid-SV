@@ -41,4 +41,4 @@ CREATE TABLE Consultas(
     CONSTRAINT fk_usuario
         FOREIGN KEY (id_usuario)
         REFERENCES Usuarios(id)
-)
+);
