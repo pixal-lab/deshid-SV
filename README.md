@@ -1,6 +1,6 @@
 # Servidor Deshidratadores Mikasa
 
-## Instalando
+## Install
 ```sh
 clone https://github.com/pixal-lab/deshid-SV
 ```
