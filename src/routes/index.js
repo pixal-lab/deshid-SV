@@ -1,9 +1,10 @@
 const { Router } = require('express');
 const router = Router();
 
-const { register } = require('../controllers/index.controller');
+const { register, addConsulta } = require('../controllers/index.controller');
 
 router.post('/API-registro', register);
+router.post('/API-addConsulta', addConsulta);
 
 
 

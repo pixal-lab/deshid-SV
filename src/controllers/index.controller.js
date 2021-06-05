@@ -16,6 +16,16 @@ const register = async (req, res) => {
     res.json(1);
 };
 
+const addConsulta = async (req, res) => {
+    const { id_usuario, titulo, descripcion } = req.body;
+    const sqlQuery = 'INSERT INTO Consultas (id_usuario, estado, titulo, descripcion) values ($1, false, $2, $3) RETURNING *';
+    const values = [id_usuario, titulo, descripcion];
+    const response = await pool.query(sqlQuery,values);
+    console.log('Insertando consulta siguiente: \n', response.rows);
+    res.json(1);
+}
+
 module.exports = {
-    register
+    register,
+    addConsulta
 };
