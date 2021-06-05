@@ -12,8 +12,9 @@ router.post('/API-registro', register);
 
 //dev
 
-const { getUsers } = require ('../controllers/dev.controller');
+const { getUsers, delUser } = require ('../controllers/dev.controller');
 
 router.get('/dev-GET-users', getUsers);
+router.post('/dev-DEL-users', delUser);
 
 module.exports = router;

@@ -7,7 +7,7 @@ const pool = new Pool({
     port: '5432'
 });
 
-const register = async (req,res) => {
+const register = async (req, res) => {
     const { nombre, contrasena, correo, direccion } = req.body;
     const sqlQuery = 'INSERT INTO Usuarios (nombre, contrasena, correo, direccion) values ($1, $2, $3, $4) RETURNING *';
     const values = [nombre, contrasena, correo, direccion];

@@ -13,6 +13,14 @@ const getUsers = async (req, res) => {
     res.json(response.rows);
 };
 
+const delUser = async (req, res) => {
+    const { id } = req.body;
+    const response = await pool.query(`delete from Usuarios where id='${id}'`);
+    console.log(response.rows);
+    res.send('hey');
+}
+
 module.exports = {
-    getUsers
+    getUsers,
+    delUser
 };
