@@ -1,13 +1,19 @@
 const { Router } = require('express');
 const router = Router();
 
-const { getUsers, register } = require('../controllers/index.controller');
+const { register } = require('../controllers/index.controller');
+
+router.post('/API-registro', register);
 
 
-router.get('/users', getUsers);
-router.get('/api/register', register);
 
 
 
+
+//dev
+
+const { getUsers } = require ('../controllers/dev.controller');
+
+router.get('/dev-GET-users', getUsers);
 
 module.exports = router;
