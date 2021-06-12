@@ -14,10 +14,10 @@ const getUsers = async (req, res) => {
 };
 
 const delUser = async (req, res) => {
-    const { id } = req.body;
-    const response = await pool.query(`delete from Usuarios where id='${id}'`);
+    const { rut } = req.body;
+    const response = await pool.query(`delete from Usuarios where rut='${rut}'`);
     console.log(response.rows);
-    res.send('hey');
+    res.send('eliminado');
 }
 
 module.exports = {
