@@ -3,6 +3,8 @@
 ## Install
 ```sh
 clone https://github.com/pixal-lab/deshid-SV
+cd deshid-SV
+npm install
 ```
 
 ## DB usage
@@ -13,4 +15,8 @@ create database DESHIDRATADOR;
 \c DESHIDRATADOR
 \i database/database.sql
 
+```
+## Start server
+```sh
+npm run dev
 ```
