@@ -1,5 +1,5 @@
 CREATE TABLE Usuarios(
-    id SERIAL PRIMARY KEY,
+    rut int PRIMARY KEY,
     nombre VARCHAR,
     contrasena VARCHAR,
     correo VARCHAR,
