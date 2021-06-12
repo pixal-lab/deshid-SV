@@ -13,11 +13,11 @@ CREATE TABLE Usuarios(
 
 CREATE TABLE Artefactos(
     id SERIAL PRIMARY KEY,
-    id_usuario INT,
+    rut_usuario INT,
     tipo VARCHAR,
     CONSTRAINT fk_usuario
-        FOREIGN KEY (id_usuario)
-        REFERENCES Usuarios(id)
+        FOREIGN KEY (rut_usuario)
+        REFERENCES Usuarios(rut)
 );
 
 CREATE TABLE Datos(
@@ -36,12 +36,12 @@ CREATE TABLE Datos(
 
 CREATE TABLE Consultas(
     id SERIAL PRIMARY KEY,
-    id_usuario INT,
+    rut_usuario INT,
     estado BOOLEAN,
     titulo VARCHAR,
     descripcion VARCHAR,
     respuesta BOOLEAN,
     CONSTRAINT fk_usuario
-        FOREIGN KEY (id_usuario)
-        REFERENCES Usuarios(id)
+        FOREIGN KEY (rut_usuario)
+        REFERENCES Usuarios(rut)
 );
