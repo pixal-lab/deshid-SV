@@ -16,16 +16,38 @@ const register = async (req, res) => {
     res.json(1);
 };
 
+const login = async (req, res) => {
+    const { usuario, contrasena} = req.body;
+    const sqlQuery = ''
+}
+
 const addConsulta = async (req, res) => {
     const { rut, titulo, descripcion } = req.body;
-    const sqlQuery = 'INSERT INTO Consultas (rut_usuario, estado, titulo, descripcion) values ($1, false, $2, $3) RETURNING *';
+    const sqlQuery = 'INSERT INTO Consultas (rut_usuario, estado, titulo, descripcion) VALUES ($1, false, $2, $3) RETURNING *';
     const values = [rut, titulo, descripcion];
     const response = await pool.query(sqlQuery,values);
     console.log('Insertando consulta siguiente: \n', response.rows);
     res.json(1);
 }
 
+const getConsultas = async (req, res) => {
+    const response = await pool.query('SELECT id, titulo, descripcion FROM Consultas WHERE estado = false;');
+    console.log(response.rows);
+    res.json(response.rows);
+}
+
+const solveConsulta = async (req, res) => {
+    const { id, respuesta } = req.body;
+    const sqlQuery = 'UPDATE Consultas SET estado = true, respuesta = "$1" WHERE id = $2;';
+    const response = await pool.query(sqlQuery,[id, respuesta]);
+    console.log('resolviendo consulta con id = :', id, '\n', response.rows);
+    res.json(1);
+}
+
 module.exports = {
     register,
-    addConsulta
+    login,
+    addConsulta,
+    getConsultas,
+    solveConsulta
 };

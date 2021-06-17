@@ -40,7 +40,7 @@ CREATE TABLE Consultas(
     estado BOOLEAN,
     titulo VARCHAR,
     descripcion VARCHAR,
-    respuesta BOOLEAN,
+    respuesta VARCHAR,
     CONSTRAINT fk_usuario
         FOREIGN KEY (rut_usuario)
         REFERENCES Usuarios(rut)

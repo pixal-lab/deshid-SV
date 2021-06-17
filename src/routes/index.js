@@ -1,10 +1,14 @@
 const { Router } = require('express');
 const router = Router();
 
-const { register, addConsulta } = require('../controllers/index.controller');
+const { register, login, addConsulta, getConsultas, solveConsulta } = require('../controllers/index.controller');
 
 router.post('/API-registro', register);
+router.post('/API-login', login);
+
 router.post('/API-addConsulta', addConsulta);
+router.get('/API-getConsultas', getConsultas);
+router.post('/API-solveConsulta', solveConsulta);
 
 
 
