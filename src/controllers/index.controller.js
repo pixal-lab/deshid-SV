@@ -8,6 +8,7 @@ const pool = new Pool({
 });
 
 const register = async (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
     const {rut, nombre, contrasena, correo, direccion } = req.body;
     const sqlQuery = 'INSERT INTO Usuarios (rut, nombre, contrasena, correo, direccion) values ($1, $2, $3, $4, $5) RETURNING *';
     const values = [rut, nombre, contrasena, correo, direccion];
@@ -22,6 +23,7 @@ const login = async (req, res) => {
 }
 
 const addConsulta = async (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
     const { rut, titulo, descripcion } = req.body;
     const sqlQuery = 'INSERT INTO Consultas (rut_usuario, estado, titulo, descripcion) VALUES ($1, false, $2, $3) RETURNING *';
     const values = [rut, titulo, descripcion];
@@ -31,12 +33,14 @@ const addConsulta = async (req, res) => {
 }
 
 const getConsultas = async (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
     const response = await pool.query('SELECT id, titulo, descripcion FROM Consultas WHERE estado = false;');
     console.log(response.rows);
     res.json(response.rows);
 }
 
 const solveConsulta = async (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
     const { id, respuesta } = req.body;
     const sqlQuery = 'UPDATE Consultas SET estado = true, respuesta = "$1" WHERE id = $2;';
     const response = await pool.query(sqlQuery,[id, respuesta]);

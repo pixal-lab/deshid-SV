@@ -1,6 +1,7 @@
 const { Router } = require('express');
+const cors = require('cors');
 const router = Router();
-
+router.use(cors());
 const { register, login, addConsulta, getConsultas, solveConsulta } = require('../controllers/index.controller');
 
 router.post('/API-registro', register);
