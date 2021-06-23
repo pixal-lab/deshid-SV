@@ -1,5 +1,5 @@
 const { json } = require('express');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
 const pool = new Pool({
     host: 'localhost',
