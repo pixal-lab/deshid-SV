@@ -21,7 +21,7 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
     const { correo, contrasena } = req.body;
-    const sqlQuery = 'SELECT count(id) FROM Usuarios WHERE correo = $1 and contrasena = $2';
+    const sqlQuery = 'SELECT count(rut) FROM Usuarios WHERE correo = $1 and contrasena = $2';
     const values = [correo, contrasena];
     const response = await pool.query(sqlQuery, values);
     if (response.rows[0].count == '1'){ // usuario correcto
