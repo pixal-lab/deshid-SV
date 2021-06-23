@@ -71,13 +71,13 @@ function verifytoken(req, res, next){
         tok = bearer.split(" ")[1];
         jwt.verify(tok, 'llavesecreta', (error, authData) => {
             if (error){
-                res.sendStatus(403);
+                res.send('badToken');
             }else{
                 next()
             }
         });
     }else{
-        res.sendStatus(403);
+        res.send('missToken');
     }
 }
 
