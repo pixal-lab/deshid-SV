@@ -132,24 +132,28 @@ const act = async (req, res) => {
 
 const verifytoken = async (req, res, next) => {
     const bearer = req.headers['authorization'];
+    let verify = false;
     if(typeof bearer !== 'undefined'){
         tok = bearer.split(" ")[1];
         jwt.verify(tok, 'llavesecreta', (error, authData) => {
             if (error){
                 res.send('badToken');
             }else{
-                const sqlQuery = 'SELECT tipo FROM Usuarios WHERE correo = $1 AND contrasena = $2;';
-                const correo = authData.user.correo;
-                const contrasena = authData.user.contrasena;
-                const values = [ correo, contrasena ];
-                const response = await pool.query(sqlQuery, values);
-                console.log('-------');
-                console.log(response.rows);
-                console.log('-------');
+                verify = true;
                 req.authData = authData;
-                next()
             }
         });
+        if (verify) {
+            const correo = req.authData.user.correo;
+            const contrasena = req.authData.user.contrasena;
+            const values = [ correo, contrasena ];
+            console.log('-------');
+            console.log(response.rows);
+            console.log('-------');
+            const sqlQuery = 'SELECT tipo FROM Usuarios WHERE correo = $1 AND contrasena = $2;';
+            const response = await pool.query(sqlQuery, values);
+            next();
+        }
     }else{
         res.send('missToken');
     }
