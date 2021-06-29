@@ -15,12 +15,20 @@ const getUsers = async (req, res) => {
 
 const delUser = async (req, res) => {
     const { rut } = req.body;
-    const response = await pool.query(`delete from Usuarios where rut='${rut}'`);
+    const response = await pool.query(`delete from Usuarios where rut='${rut}';`);
     console.log(response.rows);
     res.send('eliminado');
 }
 
+const getAllConsultas = async (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    const response = await pool.query('SELECT * FROM Consultas;');
+    console.log(response.rows);
+    res.json(response.rows);
+}
+
 module.exports = {
     getUsers,
-    delUser
+    delUser,
+    getAllConsultas
 };

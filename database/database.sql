@@ -4,20 +4,21 @@ DROP TABLE IF EXISTS Datos CASCADE;
 DROP TABLE IF EXISTS Consultas CASCADE;
 
 CREATE TABLE Usuarios(
-    rut int PRIMARY KEY,
+    rut INT PRIMARY KEY,
     nombre VARCHAR,
     contrasena VARCHAR,
-    correo VARCHAR,
-    direccion VARCHAR
+    correo VARCHAR UNIQUE,
+    direccion VARCHAR,
+    tipo INT
 );
 
 CREATE TABLE Artefactos(
     id SERIAL PRIMARY KEY,
-    rut_usuario INT,
+    correo VARCHAR,
     tipo VARCHAR,
     CONSTRAINT fk_usuario
-        FOREIGN KEY (rut_usuario)
-        REFERENCES Usuarios(rut)
+        FOREIGN KEY (correo)
+        REFERENCES Usuarios(correo)
 );
 
 CREATE TABLE Datos(
@@ -36,12 +37,12 @@ CREATE TABLE Datos(
 
 CREATE TABLE Consultas(
     id SERIAL PRIMARY KEY,
-    rut_usuario INT,
+    correo VARCHAR,
     estado BOOLEAN,
     titulo VARCHAR,
     descripcion VARCHAR,
     respuesta VARCHAR,
     CONSTRAINT fk_usuario
-        FOREIGN KEY (rut_usuario)
-        REFERENCES Usuarios(rut)
+        FOREIGN KEY (correo)
+        REFERENCES Usuarios(correo)
 );

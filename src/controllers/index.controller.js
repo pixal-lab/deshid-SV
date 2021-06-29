@@ -12,10 +12,20 @@ const pool = new Pool({
 const register = async (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
     const {rut, nombre, contrasena, correo, direccion } = req.body;
-    const sqlQuery = 'INSERT INTO Usuarios (rut, nombre, contrasena, correo, direccion) values ($1, $2, $3, $4, $5) RETURNING *';
+    const sqlQuery = 'INSERT INTO Usuarios (rut, nombre, contrasena, correo, direccion, tipo) values ($1, $2, $3, $4, $5, 0) RETURNING *';
     const values = [rut, nombre, contrasena, correo, direccion];
     const response = await pool.query(sqlQuery, values);
     console.log('Registrando usuario con los datos: \n', response.rows);
+    res.json(1);
+};
+
+const modRegister = async (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    const {rut, nombre, contrasena, correo, direccion } = req.body;
+    const sqlQuery = 'INSERT INTO Usuarios (rut, nombre, contrasena, correo, direccion, tipo) values ($1, $2, $3, $4, $5, 1) RETURNING *';
+    const values = [rut, nombre, contrasena, correo, direccion];
+    const response = await pool.query(sqlQuery, values);
+    console.log('Registrando mod con los datos: \n', response.rows);
     res.json(1);
 };
 
@@ -34,16 +44,17 @@ const login = async (req, res) => {
                 token
             })
         })
+    }else{
+        res.send('Error');
     }
-    
-    
 }
 
 const addConsulta = async (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
-    const { rut, titulo, descripcion } = req.body;
-    const sqlQuery = 'INSERT INTO Consultas (rut_usuario, estado, titulo, descripcion) VALUES ($1, false, $2, $3) RETURNING *';
-    const values = [rut, titulo, descripcion];
+    const { titulo, descripcion } = req.body;
+    const sqlQuery = 'INSERT INTO Consultas (correo, estado, titulo, descripcion) VALUES ($1, false, $2, $3) RETURNING *';
+    const correo = req.authData.user.correo;
+    const values = [correo, titulo, descripcion];
     const response = await pool.query(sqlQuery,values);
     console.log('Insertando consulta siguiente: \n', response.rows);
     res.json(1);
@@ -51,7 +62,9 @@ const addConsulta = async (req, res) => {
 
 const getConsultas = async (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
-    const response = await pool.query('SELECT id, titulo, descripcion FROM Consultas WHERE estado = false;');
+    const sqlQuery = 'SELECT id, titulo, descripcion, estado, respuesta FROM Consultas WHERE correo = $1;';
+    const correo = req.authData.user.correo;
+    const response = await pool.query(sqlQuery,[correo]);
     console.log(response.rows);
     res.json(response.rows);
 }
@@ -65,7 +78,59 @@ const solveConsulta = async (req, res) => {
     res.json(1);
 }
 
-function verifytoken(req, res, next){
+const addDato = async (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    const { id, tiempo, humedad, temperatura, peso, gas } = req.body;
+    const sqlQuery = 'INSERT INTO Datos ( id_artefacto, tiempo, humedad, temperatura, peso, gas, alimento) values ($1, $2, $3, $4, $5, $6) RETURNING *';
+    const alimento = ""; // por definir
+    const values = [id, tiempo, humedad, temperatura, peso, gas, alimento];
+    const response = await pool.query(sqlQuery, values);
+    console.log('Añadiendo dato: \n', response.rows);
+    res.json(1);
+}
+
+const addDeshid = async (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    const { id, tipo} = req.body;
+    const sqlQuery = 'INSERT INTO Artefactos ( id, tipo) values () RETURNING *';
+    const alimento = ""; // por definir
+    const values = [id, tiempo, humedad, temperatura, peso, gas, alimento];
+    const response = await pool.query(sqlQuery, values);
+    console.log('Añadiendo dato: \n', response.rows);
+    res.json(1);
+}
+
+const delDeshid = async (req, res) => {
+    // borra deshidratador de un usuario
+}
+
+const getDeshid = async (req, res) => {
+    // retorna deshidratadores de un usuario
+}
+
+const getDato = async (req, res) => {
+    // retorna dato actual del deshidratador
+}
+
+const getAllDato = async (req, res) => {
+    // retorna datos historicos del deshidratador
+}
+
+const startProcess = async (req, res) => {
+    // inicia proceso de deshidratador
+}
+
+const stopProcess = async (req, res) => {
+    // detiene proceso de deshidratador
+}
+
+const act = async (req, res) => {
+    // envia instruccion al actuador
+}
+
+
+
+const verifytoken = async (req, res, next) => {
     const bearer = req.headers['authorization'];
     if(typeof bearer !== 'undefined'){
         tok = bearer.split(" ")[1];
@@ -73,6 +138,15 @@ function verifytoken(req, res, next){
             if (error){
                 res.send('badToken');
             }else{
+                const sqlQuery = 'SELECT tipo FROM Usuarios WHERE correo = $1 AND contrasena = $2;';
+                const correo = authData.user.correo;
+                const contrasena = authData.user.contrasena;
+                const values = [ correo, contrasena ];
+                const response = await pool.query(sqlQuery, values);
+                console.log('-------');
+                console.log(response.rows);
+                console.log('-------');
+                req.authData = authData;
                 next()
             }
         });
@@ -84,8 +158,18 @@ function verifytoken(req, res, next){
 module.exports = {
     verifytoken,
     register,
+    modRegister,
     login,
     addConsulta,
     getConsultas,
-    solveConsulta
+    solveConsulta,
+    addDato,
+    addDeshid,
+    delDeshid,
+    getDeshid,
+    getDato,
+    getAllDato,
+    startProcess,
+    stopProcess,
+    act
 };
