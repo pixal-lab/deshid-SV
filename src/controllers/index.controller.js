@@ -69,13 +69,27 @@ const getConsultas = async (req, res) => {
     res.json(response.rows);
 }
 
+const getUnsolveConsultas = async (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    const sqlQuery = 'SELECT id, titulo, descripcion, estado, respuesta FROM Consultas WHERE correo = $1;';
+    const correo = req.authData.user.correo;
+    const response = await pool.query(sqlQuery,[correo]);
+    console.log(response.rows);
+    res.json(response.rows);
+}
+
 const solveConsulta = async (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
     const { id, respuesta } = req.body;
-    const sqlQuery = 'UPDATE Consultas SET estado = true, respuesta = "$1" WHERE id = $2;';
-    const response = await pool.query(sqlQuery,[id, respuesta]);
-    console.log('resolviendo consulta con id = :', id, '\n', response.rows);
-    res.json(1);
+    const { tipo } = req.tipo;
+    if (tipo = 1){
+        const sqlQuery = 'UPDATE Consultas SET estado = true, respuesta = "$1" WHERE id = $2;';
+        const response = await pool.query(sqlQuery,[id, respuesta]);
+        console.log('resolviendo consulta con id = :', id, '\n', response.rows);
+        res.json(1);
+    } else {
+        res.send('permission error')
+    }
 }
 
 const addDato = async (req, res) => {
@@ -144,14 +158,12 @@ const verifytoken = async (req, res, next) => {
             }
         });
         if (verify) {
+            const sqlQuery = 'SELECT tipo FROM Usuarios WHERE correo = $1 AND contrasena = $2;';
             const correo = req.authData.user.correo;
             const contrasena = req.authData.user.contrasena;
             const values = [ correo, contrasena ];
-            console.log('-------');
-            console.log(response.rows);
-            console.log('-------');
-            const sqlQuery = 'SELECT tipo FROM Usuarios WHERE correo = $1 AND contrasena = $2;';
             const response = await pool.query(sqlQuery, values);
+            req.tipo = response.rows[0].tipo;
             next();
         }
     }else{
@@ -166,6 +178,7 @@ module.exports = {
     login,
     addConsulta,
     getConsultas,
+    getUnsolveConsultas,
     solveConsulta,
     addDato,
     addDeshid,

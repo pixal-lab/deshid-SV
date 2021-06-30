@@ -10,6 +10,7 @@ const {
     login,
     addConsulta,
     getConsultas,
+    getUnsolveConsultas,
     solveConsulta,
     addDato,
     addDeshid,
@@ -29,6 +30,7 @@ router.post('/API-login', login);
 
 router.post('/API-addConsulta', verifytoken, addConsulta);
 router.get('/API-getConsultas', verifytoken, getConsultas);
+router.get('/API-getUnsolveConsultas', verifytoken, getUnsolveConsultas);
 router.post('/API-solveConsulta', verifytoken, solveConsulta);
 
 router.post('/API-addDato', addDato);
