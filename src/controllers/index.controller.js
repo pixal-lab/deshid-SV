@@ -30,6 +30,7 @@ const modRegister = async (req, res) => {
 };
 
 const login = async (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
     const { correo, contrasena } = req.body;
     const sqlQuery = 'SELECT count(*) FROM Usuarios WHERE correo = $1 and contrasena = $2';
     const values = [correo, contrasena];
@@ -71,11 +72,15 @@ const getConsultas = async (req, res) => {
 
 const getUnsolveConsultas = async (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
-    const sqlQuery = 'SELECT id, titulo, descripcion, estado, respuesta FROM Consultas WHERE correo = $1;';
-    const correo = req.authData.user.correo;
-    const response = await pool.query(sqlQuery,[correo]);
-    console.log(response.rows);
-    res.json(response.rows);
+    const { tipo } = req.tipo;
+    if (tipo = 1){
+        const sqlQuery = 'SELECT id, titulo, descripcion FROM Consultas WHERE estado = false;';
+        const response = await pool.query(sqlQuery);
+        console.log(response.rows);
+        res.json(response.rows);
+    } else {
+        res.send('permission error')
+    }
 }
 
 const solveConsulta = async (req, res) => {
@@ -92,18 +97,22 @@ const solveConsulta = async (req, res) => {
     }
 }
 
-const addDato = async (req, res) => {
+const addDeshid = async (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
-    const { id, tiempo, humedad, temperatura, peso, gas } = req.body;
-    const sqlQuery = 'INSERT INTO Datos ( id_artefacto, tiempo, humedad, temperatura, peso, gas, alimento) values ($1, $2, $3, $4, $5, $6) RETURNING *';
-    const alimento = ""; // por definir
-    const values = [id, tiempo, humedad, temperatura, peso, gas, alimento];
-    const response = await pool.query(sqlQuery, values);
-    console.log('Añadiendo dato: \n', response.rows);
-    res.json(1);
+    const { modelo } = req.body;
+    const { tipo } = req.tipo;
+    if (tipo = 1){
+        const sqlQuery = 'INSERT INTO Artefactos (tipo) values ($1) RETURNING *';
+        const values = [modelo];
+        const response = await pool.query(sqlQuery, values);
+        console.log('Añadiendo deshidratador: \n', response.rows);
+        res.json(response.rows);
+    } else {
+        res.send('permission error')
+    }
 }
 
-const addDeshid = async (req, res) => {
+const linkDeshid = async (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
     const { id, tipo} = req.body;
     const sqlQuery = 'INSERT INTO Artefactos ( id, tipo) values () RETURNING *';
@@ -136,6 +145,17 @@ const startProcess = async (req, res) => {
 
 const stopProcess = async (req, res) => {
     // detiene proceso de deshidratador
+}
+
+const addDato = async (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    const { id, tiempo, humedad, temperatura, peso, gas } = req.body;
+    const sqlQuery = 'INSERT INTO Datos ( id_artefacto, tiempo, humedad, temperatura, peso, gas, alimento) values ($1, $2, $3, $4, $5, $6) RETURNING *';
+    const alimento = ""; // por definir
+    const values = [id, tiempo, humedad, temperatura, peso, gas, alimento];
+    const response = await pool.query(sqlQuery, values);
+    console.log('Añadiendo dato: \n', response.rows);
+    res.json(1);
 }
 
 const act = async (req, res) => {
