@@ -16,6 +16,8 @@ CREATE TABLE Artefactos(
     id SERIAL PRIMARY KEY,
     correo VARCHAR,
     tipo VARCHAR,
+    inProcess BOOLEAN,
+    alimento VARCHAR,
     CONSTRAINT fk_usuario
         FOREIGN KEY (correo)
         REFERENCES Usuarios(correo)
