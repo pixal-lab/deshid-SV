@@ -14,6 +14,7 @@ const {
     solveConsulta,
     addDato,
     addDeshid,
+    linkDeshid,
     delDeshid,
     getDeshid,
     getDato,
@@ -25,16 +26,17 @@ const {
 } = require('../controllers/index.controller');
 
 router.post('/API-registro', register);
-router.post('/API-MOD-registro', modRegister);
+router.post('/API-MOD-registro', verifytoken, modRegister);
 router.post('/API-login', login);
 
 router.post('/API-addConsulta', verifytoken, addConsulta);
 router.get('/API-getConsultas', verifytoken, getConsultas);
-router.get('/API-getUnsolveConsultas', verifytoken, getUnsolveConsultas);
+router.get('/API-getUnsoCons', verifytoken, getUnsolveConsultas);
 router.post('/API-solveConsulta', verifytoken, solveConsulta);
 
 router.post('/API-addDato', addDato);
 router.post('/API-addDeshid', verifytoken, addDeshid);
+router.post('/API-linkDeshid', verifytoken, linkDeshid);
 router.post('/API-delDeshid', verifytoken, delDeshid);
 router.get('/API-getDeshid', verifytoken, getDeshid);
 router.get('/API-getDato', verifytoken, getDato);

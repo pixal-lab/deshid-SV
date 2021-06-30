@@ -12,7 +12,7 @@ const pool = new Pool({
 const register = async (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
     const {rut, nombre, contrasena, correo, direccion } = req.body;
-    const sqlQuery = 'INSERT INTO Usuarios (rut, nombre, contrasena, correo, direccion, tipo) values ($1, $2, $3, $4, $5, 0) RETURNING *';
+    const sqlQuery = 'INSERT INTO Usuarios (rut, nombre, contrasena, correo, direccion, tipo) values ($1, $2, $3, $4, $5, 1) RETURNING *';
     const values = [rut, nombre, contrasena, correo, direccion];
     const response = await pool.query(sqlQuery, values);
     console.log('Registrando usuario con los datos: \n', response.rows);
@@ -21,12 +21,17 @@ const register = async (req, res) => {
 
 const modRegister = async (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
-    const {rut, nombre, contrasena, correo, direccion } = req.body;
-    const sqlQuery = 'INSERT INTO Usuarios (rut, nombre, contrasena, correo, direccion, tipo) values ($1, $2, $3, $4, $5, 1) RETURNING *';
-    const values = [rut, nombre, contrasena, correo, direccion];
-    const response = await pool.query(sqlQuery, values);
-    console.log('Registrando mod con los datos: \n', response.rows);
-    res.json(1);
+    const { tipo } = req.tipo;
+    if (tipo == 2){
+        const {rut, nombre, contrasena, correo, direccion } = req.body;
+        const sqlQuery = 'INSERT INTO Usuarios (rut, nombre, contrasena, correo, direccion, tipo) values ($1, $2, $3, $4, $5, 2) RETURNING *';
+        const values = [rut, nombre, contrasena, correo, direccion];
+        const response = await pool.query(sqlQuery, values);
+        console.log('Registrando mod con los datos: \n', response.rows);
+        res.json(1);
+    } else {
+        res.send('permission error')
+    }
 };
 
 const login = async (req, res) => {
@@ -73,7 +78,7 @@ const getConsultas = async (req, res) => {
 const getUnsolveConsultas = async (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
     const { tipo } = req.tipo;
-    if (tipo = 1){
+    if (tipo == 2){
         const sqlQuery = 'SELECT id, titulo, descripcion FROM Consultas WHERE estado = false;';
         const response = await pool.query(sqlQuery);
         console.log(response.rows);
@@ -87,7 +92,7 @@ const solveConsulta = async (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
     const { id, respuesta } = req.body;
     const { tipo } = req.tipo;
-    if (tipo = 1){
+    if (tipo == 2){
         const sqlQuery = 'UPDATE Consultas SET estado = true, respuesta = "$1" WHERE id = $2;';
         const response = await pool.query(sqlQuery,[id, respuesta]);
         console.log('resolviendo consulta con id = :', id, '\n', response.rows);
@@ -101,8 +106,8 @@ const addDeshid = async (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
     const { modelo } = req.body;
     const { tipo } = req.tipo;
-    if (tipo = 1){
-        const sqlQuery = 'INSERT INTO Artefactos (tipo) values ($1) RETURNING *';
+    if (tipo == 2){
+        const sqlQuery = 'INSERT INTO Artefactos (tipo, inProcess) values ($1, false) RETURNING *;';
         const values = [modelo];
         const response = await pool.query(sqlQuery, values);
         console.log('Añadiendo deshidratador: \n', response.rows);
@@ -114,21 +119,60 @@ const addDeshid = async (req, res) => {
 
 const linkDeshid = async (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
-    const { id, tipo} = req.body;
-    const sqlQuery = 'INSERT INTO Artefactos ( id, tipo) values () RETURNING *';
-    const alimento = ""; // por definir
-    const values = [id, tiempo, humedad, temperatura, peso, gas, alimento];
+    const { id } = req.body;
+    const correo = req.authData.user.correo;
+    //TODO revisar que no este previamente linkeado
+    const sqlQuery = 'UPDATE Artefactos SET correo = $1 WHERE id = $2;';
+    const values = [correo, id];
     const response = await pool.query(sqlQuery, values);
-    console.log('Añadiendo dato: \n', response.rows);
+    console.log('enlazando deshidratador: \n', response.rows);
     res.json(1);
 }
 
 const delDeshid = async (req, res) => {
-    // borra deshidratador de un usuario
+    res.header("Access-Control-Allow-Origin", "*");
+    const { id } = req.body;
+    const correo = req.authData.user.correo;
+    const sqlQuery = 'UPDATE Artefactos SET correo = "", inProcess = false WHERE correo = $1 AND id = $2;';
+    const values = [correo, id];
+    const response = await pool.query(sqlQuery, values);
+    console.log('desenlazando deshidratador: \n', response.rows);
+    res.json(1);
 }
 
 const getDeshid = async (req, res) => {
     // retorna deshidratadores de un usuario
+    res.header("Access-Control-Allow-Origin", "*");
+    const correo = req.authData.user.correo;
+    const sqlQuery = 'SELECT * FROM Artefactos WHERE correo = $1;';
+    const values = [correo];
+    const response = await pool.query(sqlQuery, values);
+    console.log('mostrando deshidratadores: \n', response.rows);
+    res.json(1);
+}
+
+const startProcess = async (req, res) => {
+    // inicia proceso de deshidratador
+    res.header("Access-Control-Allow-Origin", "*");
+    const { id, alimento } = req.body;
+    const correo = req.authData.user.correo;
+    const sqlQuery = 'UPDATE Artefactos SET inProcess = true, alimento = $1 WHERE correo = $2 AND id = $3;';
+    const values = [alimento, correo, id];
+    const response = await pool.query(sqlQuery, values);
+    console.log('iniciando proceso: \n', response.rows);
+    res.json(1);
+}
+
+const stopProcess = async (req, res) => {
+    // detiene proceso de deshidratador
+    res.header("Access-Control-Allow-Origin", "*");
+    const { id } = req.body;
+    const correo = req.authData.user.correo;
+    const sqlQuery = 'UPDATE Artefactos SET inProcess = false WHERE correo = $1 AND id = $2;';
+    const values = [correo, id];
+    const response = await pool.query(sqlQuery, values);
+    console.log('deteniendo proceso: \n', response.rows);
+    res.json(1);
 }
 
 const getDato = async (req, res) => {
@@ -139,15 +183,8 @@ const getAllDato = async (req, res) => {
     // retorna datos historicos del deshidratador
 }
 
-const startProcess = async (req, res) => {
-    // inicia proceso de deshidratador
-}
-
-const stopProcess = async (req, res) => {
-    // detiene proceso de deshidratador
-}
-
 const addDato = async (req, res) => {
+    // falta revisar
     res.header("Access-Control-Allow-Origin", "*");
     const { id, tiempo, humedad, temperatura, peso, gas } = req.body;
     const sqlQuery = 'INSERT INTO Datos ( id_artefacto, tiempo, humedad, temperatura, peso, gas, alimento) values ($1, $2, $3, $4, $5, $6) RETURNING *';
@@ -202,6 +239,7 @@ module.exports = {
     solveConsulta,
     addDato,
     addDeshid,
+    linkDeshid,
     delDeshid,
     getDeshid,
     getDato,
