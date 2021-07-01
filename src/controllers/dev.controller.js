@@ -15,7 +15,7 @@ const getUsers = async (req, res) => {
 
 const delUser = async (req, res) => {
     const { rut } = req.body;
-    const response = await pool.query(`delete from Usuarios where rut='${rut}';`);
+    const response = await pool.query(`delete from Usuarios where rut='${rut}' cascade;`);
     console.log(response.rows);
     res.send('eliminado');
 }

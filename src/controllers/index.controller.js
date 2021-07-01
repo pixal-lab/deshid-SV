@@ -21,7 +21,7 @@ const register = async (req, res) => {
 
 const modRegister = async (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
-    const { tipo } = req.tipo;
+    const tipo = req.tipo;
     if (tipo == 2){
         const {rut, nombre, contrasena, correo, direccion } = req.body;
         const sqlQuery = 'INSERT INTO Usuarios (rut, nombre, contrasena, correo, direccion, tipo) values ($1, $2, $3, $4, $5, 2) RETURNING *';
@@ -30,7 +30,7 @@ const modRegister = async (req, res) => {
         console.log('Registrando mod con los datos: \n', response.rows);
         res.json(1);
     } else {
-        res.send('permission error')
+        res.send('Permission error')
     }
 };
 
@@ -77,7 +77,7 @@ const getConsultas = async (req, res) => {
 
 const getUnsolveConsultas = async (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
-    const { tipo } = req.tipo;
+    const tipo = req.tipo;
     if (tipo == 2){
         const sqlQuery = 'SELECT id, titulo, descripcion FROM Consultas WHERE estado = false;';
         const response = await pool.query(sqlQuery);
@@ -91,7 +91,7 @@ const getUnsolveConsultas = async (req, res) => {
 const solveConsulta = async (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
     const { id, respuesta } = req.body;
-    const { tipo } = req.tipo;
+    const tipo= req.tipo;
     if (tipo == 2){
         const sqlQuery = 'UPDATE Consultas SET estado = true, respuesta = "$1" WHERE id = $2;';
         const response = await pool.query(sqlQuery,[id, respuesta]);
@@ -105,7 +105,7 @@ const solveConsulta = async (req, res) => {
 const addDeshid = async (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
     const { modelo } = req.body;
-    const { tipo } = req.tipo;
+    const tipo = req.tipo;
     if (tipo == 2){
         const sqlQuery = 'INSERT INTO Artefactos (tipo, inProcess) values ($1, false) RETURNING *;';
         const values = [modelo];
