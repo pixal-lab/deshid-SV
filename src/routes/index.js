@@ -15,7 +15,7 @@ const {
     addDato,
     addDeshid,
     linkDeshid,
-    delDeshid,
+    deslinkDeshid,
     getDeshid,
     getDato,
     getAllDato,
@@ -37,7 +37,7 @@ router.post('/API-solveConsulta', verifytoken, solveConsulta);
 router.post('/API-addDato', addDato);
 router.post('/API-addDeshid', verifytoken, addDeshid);
 router.post('/API-linkDeshid', verifytoken, linkDeshid);
-router.post('/API-delDeshid', verifytoken, delDeshid);
+router.post('/API-deslinkDeshid', verifytoken, deslinkDeshid);
 router.get('/API-getDeshid', verifytoken, getDeshid);
 router.get('/API-getDato', verifytoken, getDato);
 router.get('/API-getAllDato', verifytoken, getAllDato);

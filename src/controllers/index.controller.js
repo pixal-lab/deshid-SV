@@ -91,10 +91,10 @@ const getUnsolveConsultas = async (req, res) => {
 const solveConsulta = async (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
     const { id, respuesta } = req.body;
-    const tipo= req.tipo;
+    const tipo = req.tipo;
     if (tipo == 2){
-        const sqlQuery = 'UPDATE Consultas SET estado = true, respuesta = "$1" WHERE id = $2;';
-        const response = await pool.query(sqlQuery,[id, respuesta]);
+        const sqlQuery = 'UPDATE Consultas SET estado = true, respuesta = $1 WHERE id = $2;';
+        const response = await pool.query(sqlQuery,[respuesta, id]);
         console.log('resolviendo consulta con id = :', id, '\n', response.rows);
         res.json(1);
     } else {
@@ -122,33 +122,33 @@ const linkDeshid = async (req, res) => {
     const { id } = req.body;
     const correo = req.authData.user.correo;
     //TODO revisar que no este previamente linkeado
-    const sqlQuery = 'UPDATE Artefactos SET correo = $1 WHERE id = $2;';
+    const sqlQuery = 'UPDATE Artefactos SET correo = $1 WHERE id = $2 RETURNING *;';
     const values = [correo, id];
     const response = await pool.query(sqlQuery, values);
     console.log('enlazando deshidratador: \n', response.rows);
-    res.json(1);
+    res.json(response.rows);
 }
 
-const delDeshid = async (req, res) => {
+const deslinkDeshid = async (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
     const { id } = req.body;
     const correo = req.authData.user.correo;
-    const sqlQuery = 'UPDATE Artefactos SET correo = "", inProcess = false WHERE correo = $1 AND id = $2;';
+    const sqlQuery = 'UPDATE Artefactos SET correo = null, inProcess = false, alimento = null WHERE correo = $1 AND id = $2 RETURNING *;';
     const values = [correo, id];
     const response = await pool.query(sqlQuery, values);
     console.log('desenlazando deshidratador: \n', response.rows);
-    res.json(1);
+    res.json(response.rows);
 }
 
 const getDeshid = async (req, res) => {
-    // retorna deshidratadores de un usuario
+    
     res.header("Access-Control-Allow-Origin", "*");
     const correo = req.authData.user.correo;
     const sqlQuery = 'SELECT * FROM Artefactos WHERE correo = $1;';
     const values = [correo];
     const response = await pool.query(sqlQuery, values);
     console.log('mostrando deshidratadores: \n', response.rows);
-    res.json(1);
+    res.json(response.rows);
 }
 
 const startProcess = async (req, res) => {
@@ -240,7 +240,7 @@ module.exports = {
     addDato,
     addDeshid,
     linkDeshid,
-    delDeshid,
+    deslinkDeshid,
     getDeshid,
     getDato,
     getAllDato,
