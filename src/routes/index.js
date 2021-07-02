@@ -9,6 +9,7 @@ const {
     modRegister,
     login,
     addConsulta,
+    delConsulta,
     getConsultas,
     getUnsolveConsultas,
     solveConsulta,
@@ -30,6 +31,7 @@ router.post('/API-MOD-registro', verifytoken, modRegister);
 router.post('/API-login', login);
 
 router.post('/API-addConsulta', verifytoken, addConsulta);
+router.post('/API-delConsulta', verifytoken, delConsulta);
 router.get('/API-getConsultas', verifytoken, getConsultas);
 router.get('/API-getUnsoCons', verifytoken, getUnsolveConsultas);
 router.post('/API-solveConsulta', verifytoken, solveConsulta);

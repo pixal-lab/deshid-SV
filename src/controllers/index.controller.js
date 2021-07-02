@@ -66,6 +66,16 @@ const addConsulta = async (req, res) => {
     res.json(1);
 }
 
+const delConsulta = async (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    const { id } = req.body;
+    const correo = req.authData.user.correo;
+    const sqlQuery = 'delete from Consultas where id=$1 and correo = $2;'
+    const response = await pool.query(sqlQuery,[id, correo]);
+    console.log('Eliminando la consulta siguiente: \n', response.rows);
+    res.json(1);
+}
+
 const getConsultas = async (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
     const sqlQuery = 'SELECT id, titulo, descripcion, estado, respuesta FROM Consultas WHERE correo = $1;';
@@ -113,7 +123,7 @@ const addDeshid = async (req, res) => {
         console.log('Añadiendo deshidratador: \n', response.rows);
         res.json(response.rows);
     } else {
-        res.send('permission error')
+        res.send('Permission error')
     }
 }
 
@@ -234,6 +244,7 @@ module.exports = {
     modRegister,
     login,
     addConsulta,
+    delConsulta,
     getConsultas,
     getUnsolveConsultas,
     solveConsulta,
