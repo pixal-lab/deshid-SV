@@ -1,6 +1,6 @@
 const { json } = require('express');
 const jwt = require('jsonwebtoken');
-const { Pool } = require('pg');
+const { Pool, DatabaseError } = require('pg');
 const pool = new Pool({
     host: 'localhost',
     user: 'postgres',
@@ -70,7 +70,7 @@ const delConsulta = async (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
     const { id } = req.body;
     const correo = req.authData.user.correo;
-    const sqlQuery = 'delete from Consultas where id=$1 and correo = $2;'
+    const sqlQuery = 'DELETE from Consultas where id = $1 and correo = $2;'
     const response = await pool.query(sqlQuery,[id, correo]);
     console.log('Eliminando la consulta siguiente: \n', response.rows);
     res.json(1);
@@ -106,7 +106,7 @@ const solveConsulta = async (req, res) => {
         const sqlQuery = 'UPDATE Consultas SET estado = true, respuesta = $1 WHERE id = $2;';
         const response = await pool.query(sqlQuery,[respuesta, id]);
         console.log('resolviendo consulta con id = :', id, '\n', response.rows);
-        res.json(1);
+        res.json(response.rows);
     } else {
         res.send('permission error')
     }
@@ -151,7 +151,6 @@ const deslinkDeshid = async (req, res) => {
 }
 
 const getDeshid = async (req, res) => {
-    
     res.header("Access-Control-Allow-Origin", "*");
     const correo = req.authData.user.correo;
     const sqlQuery = 'SELECT * FROM Artefactos WHERE correo = $1;';
@@ -162,7 +161,6 @@ const getDeshid = async (req, res) => {
 }
 
 const startProcess = async (req, res) => {
-    // inicia proceso de deshidratador
     res.header("Access-Control-Allow-Origin", "*");
     const { id, alimento } = req.body;
     const correo = req.authData.user.correo;
@@ -170,39 +168,74 @@ const startProcess = async (req, res) => {
     const values = [alimento, correo, id];
     const response = await pool.query(sqlQuery, values);
     console.log('iniciando proceso: \n', response.rows);
-    res.json(1);
+    console.log(id,alimento,correo)
+    res.json(response.rows);
 }
 
 const stopProcess = async (req, res) => {
-    // detiene proceso de deshidratador
     res.header("Access-Control-Allow-Origin", "*");
     const { id } = req.body;
     const correo = req.authData.user.correo;
-    const sqlQuery = 'UPDATE Artefactos SET inProcess = false WHERE correo = $1 AND id = $2;';
+    const sqlQuery = 'UPDATE Artefactos SET inProcess = false, alimento = null WHERE correo = $1 AND id = $2;';
     const values = [correo, id];
     const response = await pool.query(sqlQuery, values);
     console.log('deteniendo proceso: \n', response.rows);
-    res.json(1);
+    res.json(response.rows);
 }
 
 const getDato = async (req, res) => {
     // retorna dato actual del deshidratador
+    res.header("Access-Control-Allow-Origin", "*");
+    const { id } = req.body;
+    const correo = req.authData.user.correo;
+    const sqlQuery = 'SELECT count(*) FROM Artefactos WHERE correo = $1 and id = $2';
+    const values = [correo, id];
+    const response = await pool.query(sqlQuery, values);
+    if (response.rows[0].count == '1'){
+        const sqlQuery2 = 'SELECT alimento, tiempo, humedad, temperatura, peso, gas FROM datos WHERE id_artefacto = $1 AND tiempo = (SELECT MAX(tiempo) FROM datos WHERE id_artefacto = $1);';
+        const response2 = await pool.query(sqlQuery2, [id]);
+        res.json(response2.rows);
+    }else{
+        res.send('error');
+    }
 }
 
 const getAllDato = async (req, res) => {
     // retorna datos historicos del deshidratador
+    res.header("Access-Control-Allow-Origin", "*");
+    const { id } = req.body;
+    const correo = req.authData.user.correo;
+    const sqlQuery = 'SELECT count(*) FROM Artefactos WHERE correo = $1 and id = $2';
+    const values = [correo, id];
+    const response = await pool.query(sqlQuery, values);
+    if (response.rows[0].count == '1'){
+        const sqlQuery2 = 'SELECT alimento, tiempo, humedad, temperatura, peso, gas FROM datos WHERE id_artefacto = $1;';
+        const response2 = await pool.query(sqlQuery2, [id]);
+        res.json(response2.rows);
+    }else{
+        res.send('error');
+    }
 }
 
 const addDato = async (req, res) => {
     // falta revisar
     res.header("Access-Control-Allow-Origin", "*");
+    // el deshidratador esta en proceso?
     const { id, tiempo, humedad, temperatura, peso, gas } = req.body;
-    const sqlQuery = 'INSERT INTO Datos ( id_artefacto, tiempo, humedad, temperatura, peso, gas, alimento) values ($1, $2, $3, $4, $5, $6) RETURNING *';
-    const alimento = ""; // por definir
-    const values = [id, tiempo, humedad, temperatura, peso, gas, alimento];
-    const response = await pool.query(sqlQuery, values);
-    console.log('Añadiendo dato: \n', response.rows);
-    res.json(1);
+    const sqlQuery = 'SELECT count(*) FROM Artefactos WHERE id = $1 and inProcess = true;';
+    const response = await pool.query(sqlQuery, [id]);
+    if (response.rows[0].count == '1'){ // usuario correcto
+        const sqlQuery2 = 'SELECT alimento FROM Artefactos WHERE id = $1;';
+        const response2 = await pool.query(sqlQuery2, [id]);
+        const alimento = response2.rows[0].alimento; 
+        const sqlQuery3 = 'INSERT INTO Datos (id_artefacto, tiempo, humedad, temperatura, peso, gas, alimento) values ($1, $2, $3, $4, $5, $6, $7) RETURNING *';
+        const values = [id, tiempo, humedad, temperatura, peso, gas, alimento];
+        const response3 = await pool.query(sqlQuery3, values);
+        console.log('Añadiendo dato: \n', response3.rows);
+        res.json(res.rows);
+    }else{
+        res.send('error');
+    }
 }
 
 const act = async (req, res) => {

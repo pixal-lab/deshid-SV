@@ -36,18 +36,19 @@ router.get('/API-getConsultas', verifytoken, getConsultas);
 router.get('/API-getUnsoCons', verifytoken, getUnsolveConsultas);
 router.post('/API-solveConsulta', verifytoken, solveConsulta);
 
-router.post('/API-addDato', addDato);
 router.post('/API-addDeshid', verifytoken, addDeshid);
 router.post('/API-linkDeshid', verifytoken, linkDeshid);
 router.post('/API-deslinkDeshid', verifytoken, deslinkDeshid);
 router.get('/API-getDeshid', verifytoken, getDeshid);
-router.get('/API-getDato', verifytoken, getDato);
-router.get('/API-getAllDato', verifytoken, getAllDato);
-router.get('/API-startProcess', verifytoken, startProcess);
-router.get('/API-stopProcess', verifytoken, stopProcess);
+
+router.post('/API-startProcess', verifytoken, startProcess);
+router.post('/API-stopProcess', verifytoken, stopProcess);
+
+router.post('/API-addDato', addDato);
 router.get('/API-act', verifytoken, act);
 
-
+router.get('/API-getDato', verifytoken, getDato);
+router.get('/API-getAllDato', verifytoken, getAllDato);
 
 
 //dev
