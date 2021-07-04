@@ -72,7 +72,7 @@ const delConsulta = async (req, res) => {
     const correo = req.authData.user.correo;
     const sqlQuery = 'DELETE from Consultas where id = $1 and correo = $2;'
     const response = await pool.query(sqlQuery,[id, correo]);
-    console.log('Eliminando la consulta siguiente: \n', response.rows);
+    console.log('Eliminando la consulta siguiente: id:'+id+', correo:'+correo+'\n', response.rows);
     res.json(1);
 }
 
@@ -81,7 +81,7 @@ const getConsultas = async (req, res) => {
     const sqlQuery = 'SELECT id, titulo, descripcion, estado, respuesta FROM Consultas WHERE correo = $1;';
     const correo = req.authData.user.correo;
     const response = await pool.query(sqlQuery,[correo]);
-    console.log(response.rows);
+    console.log('Mostrando consultas de '+ correo , response.rows);
     res.json(response.rows);
 }
 
