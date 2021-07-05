@@ -47,8 +47,8 @@ router.post('/API-stopProcess', verifytoken, stopProcess);
 router.post('/API-addDato', addDato);
 router.get('/API-act', verifytoken, act);
 
-router.get('/API-getDato', verifytoken, getDato);
-router.get('/API-getAllDato', verifytoken, getAllDato);
+router.post('/API-getDato', verifytoken, getDato);
+router.post('/API-getAllDato', verifytoken, getAllDato);
 
 
 //dev
