@@ -180,7 +180,15 @@ const stopProcess = async (req, res) => {
     const values = [correo, id];
     const response = await pool.query(sqlQuery, values);
     console.log('deteniendo proceso: \n', response.rows);
+    insertLimit(id)
     res.json(response.rows);
+}
+
+const insertLimit = async (id) => {
+    const sqlQuery3 = 'INSERT INTO Datos (id_artefacto, tiempo, humedad, temperatura, peso, gas, alimento) values ($1, $2, $3, $4, $5, $6, $7) RETURNING *';
+    const values = [id, parseInt(Date.now()/1000), -100, -100, -100, -100, 'end'];
+    const response3 = await pool.query(sqlQuery3, values);
+    console.log('Añadiendo limite: \n', response3.rows);
 }
 
 const getDato = async (req, res) => {
@@ -221,7 +229,7 @@ const addDato = async (req, res) => {
     // falta revisar
     res.header("Access-Control-Allow-Origin", "*");
     // el deshidratador esta en proceso?
-    const { id, tiempo, humedad, temperatura, peso, gas } = req.body;
+    const { id, humedad, temperatura, peso, gas } = req.body;
     const sqlQuery = 'SELECT count(*) FROM Artefactos WHERE id = $1 and inProcess = true;';
     const response = await pool.query(sqlQuery, [id]);
     if (response.rows[0].count == '1'){ // usuario correcto
@@ -229,10 +237,10 @@ const addDato = async (req, res) => {
         const response2 = await pool.query(sqlQuery2, [id]);
         const alimento = response2.rows[0].alimento; 
         const sqlQuery3 = 'INSERT INTO Datos (id_artefacto, tiempo, humedad, temperatura, peso, gas, alimento) values ($1, $2, $3, $4, $5, $6, $7) RETURNING *';
-        const values = [id, tiempo, humedad, temperatura, peso, gas, alimento];
+        const values = [id, parseInt(Date.now()/1000), humedad, temperatura, peso, gas, alimento];
         const response3 = await pool.query(sqlQuery3, values);
         console.log('Añadiendo dato: \n', response3.rows);
-        res.json(res.rows);
+        res.json(response3.rows);
     }else{
         res.send('error');
     }
