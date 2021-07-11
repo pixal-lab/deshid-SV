@@ -1,7 +1,9 @@
 import random
 
-users = open('users.csv','r')
-artefactos = open('artefactos.csv','w')
+users = open('users.txt','r')
+artefactos = open('artefactos.txt','w')
+
+alimList = ['Manzana', 'Kiwi', 'Platano', 'Damasco', 'Piña', 'Naranja']
 
 id = 1000
 inprocess = ''
@@ -10,12 +12,12 @@ for i in users:
     for j in range(2):
         if random.random() <= 0.8:
             inprocess = 'true'
-            alimento = ',alimento' + str(id)
+            alimento = random.choice(alimList) + '\n'
         else:
             inprocess = 'false'
-            alimento = ',null'
-        line = str(id) + ',' + correo + ',tipo' + str(id) + ',' + inprocess + alimento
-        artefactos.write(line + '\n')
+            alimento = 'null' + '\n'
+        line = str(id) + ',' + correo + ',tipo' + str(id) + ',' + inprocess + ',' + alimento
+        artefactos.write(line)
         id += 1
 
 users.close()

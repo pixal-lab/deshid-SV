@@ -26,7 +26,7 @@ CREATE TABLE Artefactos(
 CREATE TABLE Datos(
     id SERIAL PRIMARY KEY,
     id_artefacto INT,
-    tiempo DECIMAL,
+    tiempo INT,
     humedad DECIMAL,
     temperatura DECIMAL,
     peso DECIMAL,
@@ -48,3 +48,11 @@ CREATE TABLE Consultas(
         FOREIGN KEY (correo)
         REFERENCES Usuarios(correo)
 );
+
+\COPY Usuarios(rut, nombre, contrasena, correo, direccion, tipo) FROM 'database/test/users.txt' DELIMITER ',';
+
+\COPY Consultas(correo, estado, titulo, descripcion, respuesta) FROM 'database/test/consultas.txt' DELIMITER ',';
+
+\COPY Artefactos(id, correo, tipo, inProcess, alimento) FROM 'database/test/artefactos.txt' DELIMITER ',';
+
+\COPY Datos(id_artefacto, tiempo, humedad, temperatura, peso, gas, alimento) FROM 'database/test/datos.txt' DELIMITER ',';
