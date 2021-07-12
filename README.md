@@ -2,7 +2,7 @@
 
 ## Install
 ```sh
-clone https://github.com/pixal-lab/deshid-SV
+git clone https://github.com/pixal-lab/deshid-SV
 cd deshid-SV
 npm install
 ```
@@ -11,8 +11,8 @@ npm install
 
 ```sql
 alter user postgres with password 'bdpw';
-create database DESHIDRATADOR;
-\c DESHIDRATADOR
+create database deshidratador;
+\c deshidratador
 \i database/database.sql
 ```
 Use just the two last lines for update
